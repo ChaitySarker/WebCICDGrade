@@ -1,0 +1,65 @@
+name: Deploy Dist
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      #- '.github/workflows/*'
+      - 'README.md'
+  workflow_dispatch:
+ 
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore WebCICDGrade.sln
+
+      - name: Test
+        run: dotnet test WebCICDGrade.sln -c Release
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore WebCICDGrade.sln
+
+      - name: Build
+        run: dotnet build WebCICDGrade.sln -c Release --no-restore
+
+      - name: Upload WebCICDGrade Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebCICDGrade-files
+          path: .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download WebCICDGrade Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: WebCICDGrade-files
+          path: .
+
+      - name: Deploy
+        run: echo "Deploy successful"
