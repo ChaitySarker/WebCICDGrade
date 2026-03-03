@@ -27,7 +27,7 @@ jobs:
       - name: Test
         run: dotnet test WebCICDGrade.sln -c Release
 
-  build:
+ build:
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -45,11 +45,11 @@ jobs:
       - name: Build
         run: dotnet build WebCICDGrade.sln -c Release --no-restore
 
-      - name: Upload build artifact
+      - name: Upload GitHub Pages artifact
         uses: actions/upload-artifact@v4
         with:
           name: WebCICDGrade-files
-          path: ./bin/Release/net8.0/* # Change path if needed
+          path: ./bin/Release/net8.0/* # Ensure this path is correct
 
   deploy:
     needs: build
@@ -60,6 +60,5 @@ jobs:
         with:
           name: WebCICDGrade-files
           path: .
-
       - name: Deploy
         run: echo "Deploy successful"
