@@ -27,7 +27,7 @@ jobs:
       - name: Test
         run: dotnet test WebCICDGrade.sln -c Release
 
- build:
+  build:
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -60,5 +60,6 @@ jobs:
         with:
           name: WebCICDGrade-files
           path: .
+
       - name: Deploy
         run: echo "Deploy successful"
