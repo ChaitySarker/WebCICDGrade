@@ -1,11 +1,14 @@
-name: Deploy WebCICDGrade
+name: Deploy Dist
 
 on:
   push:
     branches:
       - main
+    paths-ignore:
+      #- '.github/workflows/*'
+      - 'README.md'
   workflow_dispatch:
-
+ 
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -18,10 +21,10 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore dependencies
+      - name: Restore
         run: dotnet restore WebCICDGrade.sln
 
-      - name: Run tests
+      - name: Test
         run: dotnet test WebCICDGrade.sln -c Release
 
   build:
@@ -36,42 +39,31 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore dependencies
+      - name: Restore
         run: dotnet restore WebCICDGrade.sln
 
-      - name: Build project
+      - name: Build
         run: dotnet build WebCICDGrade.sln -c Release --no-restore
 
-      - name: Publish project
-        run: dotnet publish WebCICDGrade.sln -c Release -o ./publish
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: WebCICDGrade-files
-          path: ./publish
+      - name: Upload GitHub Pages artifact
+       uses: actions/upload-pages-artifact@v4.0.0
+  with:
+    # Artifact name
+    name: # optional, default is github-pages
+    # Path of the directory containing the static assets.
+    path: # default is _site/
+    # Duration after which artifact will expire in days.
+    retention-days: # optional, default is 1
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download WebCICDGrade artifact
+      - name: Download WebCICDGrade Artifact
         uses: actions/download-artifact@v4
         with:
           name: WebCICDGrade-files
-          path: ./deploy
+          path: .
 
-      - name: Deploy to server via SSH
-        run: |
-          echo "Starting deployment..."
-          scp -r ./deploy/* user@your-server:/path/to/deploy
-          echo "Deploying completed!"
-        
-      - name: Deploy to production (Optional: Using URL for Deployment)
-        run: |
-          echo "Deployment URL: http://your-server-address.com"
-          curl -X POST http://your-server-address.com/deploy
-          echo "Deployment complete!"
+      - name: Deploy
+        run: echo "Deploy successful"
