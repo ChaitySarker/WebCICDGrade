@@ -22,10 +22,10 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore
-        run: dotnet restore GradeSolution.sln
+        run: dotnet restore WebCICDGrade.sln
 
       - name: Test
-        run: dotnet test GradeSolution.sln -c Release
+        run: dotnet test WebCICDGrade.sln -c Release
 
   build:
     needs: test
@@ -40,25 +40,25 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore
-        run: dotnet restore GradeSolution.sln
+        run: dotnet restore WebCICDGrade.sln
 
       - name: Build
-        run: dotnet build GradeSolution.sln -c Release --no-restore
+        run: dotnet build WebCICDGrade.sln -c Release --no-restore
 
-      - name: Upload GradeSolution Artifact
+      - name: Upload WebCICDGrade Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GradeSolution-files
+          name: WebCICDGrade-files
           path: .
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download GradeSolution Artifact
+      - name: Download WebCICDGrade Artifact
         uses: actions/download-artifact@v4
         with:
-          name: GradeSolution-files
+          name: WebCICDGrade-files
           path: .
 
       - name: Deploy
