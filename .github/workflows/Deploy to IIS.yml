@@ -1,0 +1,35 @@
+name: Deploy to IIS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Publish Project
+      run: dotnet publish -c Release -o C:\temp\publish
+
+    - name: Stop IIS App Pool
+      run: |
+        Import-Module WebAdministration
+        Stop-WebAppPool -Name "CICDPool"
+
+    - name: Copy Files to IIS
+      run: |
+        Copy-Item -Path C:\temp\publish\* -Destination C:\WebApp\CICD -Recurse -Force
+
+    - name: Start IIS App Pool
+      run: |
+        Start-WebAppPool -Name "CICDPool"
