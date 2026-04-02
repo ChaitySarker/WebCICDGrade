@@ -16,15 +16,15 @@ jobs:
     - name: Publish Project
       run: dotnet publish -c Release -o C:\temp\publish
 
-    - name: Stop IIS App Pool
+    - name: Ensure Temp Folder Clean
       run: |
-        Import-Module WebAdministration
-        Stop-WebAppPool -Name "CICDPool"
+        if (Test-Path "C:\temp\publish") {
+          Remove-Item "C:\temp\publish\*" -Recurse -Force -ErrorAction SilentlyContinue
+        }
 
-    - name: Copy Files to IIS
+    - name: Copy Files to IIS (No AppPool Stop)
       run: |
-        Copy-Item -Path C:\temp\publish\* -Destination C:\WebApp\CICD -Recurse -Force
+        robocopy C:\temp\publish C:\WebApp\CICD /MIR /R:1 /W:1
 
-    - name: Start IIS App Pool
-      run: |
-        Start-WebAppPool -Name "CICDPool"
+    - name: Done
+      run: echo "Deployment Completed Successfully"
