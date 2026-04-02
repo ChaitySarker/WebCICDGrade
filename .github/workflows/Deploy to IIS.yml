@@ -13,18 +13,18 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
+    - name: Clean Publish Folder
+      run: |
+        if (Test-Path "C:\temp\publish") {
+          Remove-Item "C:\temp\publish" -Recurse -Force -ErrorAction SilentlyContinue
+        }
+
     - name: Publish Project
       run: dotnet publish -c Release -o C:\temp\publish
 
-    - name: Ensure Temp Folder Clean
-      run: |
-        if (Test-Path "C:\temp\publish") {
-          Remove-Item "C:\temp\publish\*" -Recurse -Force -ErrorAction SilentlyContinue
-        }
-
-    - name: Copy Files to IIS (No AppPool Stop)
+    - name: Deploy to IIS Folder
       run: |
         robocopy C:\temp\publish C:\WebApp\CICD /MIR /R:1 /W:1
 
     - name: Done
-      run: echo "Deployment Completed Successfully"
+      run: echo "Deploy Success"
